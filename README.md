@@ -20,4 +20,4 @@ sudo python setup.py install
 Download this code:
 git clone https://github.com/williamolyolson/pikiln
 
-python kiln.py <TEMP> <RISETIME(s)> <SOAKTIME(s)> <LOWTEMPTOLERANCE(degc)> <HIGHTEMPTOLERANCE(degc)> <REPORTINGINTERVAL(s)>
+python kiln.py <TEMP> <RISETIME(sec)> <SOAKTIME(sec)> <LOWTEMPTOLERANCE(degc)> <HIGHTEMPTOLERANCE(degc)> <REPORTINGINTERVAL(sec)>
