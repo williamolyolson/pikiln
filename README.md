@@ -7,6 +7,9 @@ RaspberryPI Zero W: https://www.adafruit.com/product/3400
 
 Thermocouple Amplifier MAX31855 breakout board: https://www.adafruit.com/product/269
 
+Inkbird Solid State Relay 40A: https://smile.amazon.com/dp/B01MCWO35P
+
+
 Prereqs:
 
 sudo apt install python-gpiozero
