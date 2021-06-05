@@ -43,20 +43,80 @@ rising = 1
 soaking = 1
 element = OutputDevice(23)
 elementState =0
-#rise
+onDutyCnt=0
+offDutyCnt=0
+onDutyTime=10
+offDutyTime=10
+tempRiseRateLimit=0
+tempRiseRate=0
+maxElementOnTime=60
+startingTemp=0
+checkFreq=10
+checkCnt=0
+
+def check_rates():
+    tempRiseRate = ((currentTemp - startingTemp)/runTime)*60
+    if tempRiseRate > tempRiseRateLimit:
+        #increase onDutyTime/decrease offDutyTime
+        if onDutyTime < maxElementOnTime
+            onDutyTime += 1
+        else:
+            offDutyTime -= 1
+            if offDutyTime < 0:
+                offDutyTime = 0
+    else:
+        #decrease onDutyTime/increase offDutytime
+
+    print('Current Rise Rate/Limit:' + str(tempRiseRate) + '/' + str(tempRiseRateLimit))
+    print('Element Duty Cycle(on/off)(s):' + str(onDutyTime) + '/' + str(offDutyTime))
+
+def element_control():
+    checkCnt += 1
+    if checkCnt >= checkFreq:
+        check_rates()
+        checkCnt = 0
+    if elementState == 1:
+        #on mode
+        if onDutyCnt < onDutyTime:
+            onDutyCnt += 1
+            offDutyCnt = offDutyTime
+        else:
+            element.off()
+            offDutyCnt = 0
+            
+        if offDutyCnt < offDutyTime:
+            offDutyCnt += 1
+            onDutyCnt = onDutyTime
+        else:
+            element.on()
+            onDutyCnt = 0
+    else:
+        #off mode
+        element.off()
+        
 currentTemp = sensor.readTempC()
+startingTemp = currentTemp
 riseInterval = round((setTemp -currentTemp)/riseTime,4)
+tempRiseRateLimit = riseInterval * 60
 if riseInterval < 0.0001:
     riseInterval = 0.0001
 stepTemp = currentTemp + riseInterval
+
+print('Starting Temp:' + str(startingTemp))
+print('Target Temp:' + str(setTemp))
+print('Temp Rise Limit(deg/min):' + str(tempRiseRatelimit))
+print('Temp Rise Interval(deg/s):' + str(riseInterval))
+print('Element Duty Cycle(on/off)(s):' + str(onDutyTime) + '/' + str(offDutyTime))
+
+#rising
 while rising == 1:
 	reportCounter += 1
 	currentTemp = sensor.readTempC()
         if currentTemp < stepTemp:
-		element.on()
+		#element.on()
                 elementState=1
 	if currentTemp > stepTemp+highTolerance:
-		element.off()
+		#element.off()
                 elementState =0
 
 	stepTemp += riseInterval
@@ -67,6 +127,7 @@ while rising == 1:
         if reportCounter >= reportInterval:
             print('Rising' + str(elementState) + '... Current temp:' + str(currentTemp) + 'C Set Temp:' + str(stepTemp) + 'C RiseTime:' + str(runTime) + 's of ' + str(riseTime) + 's')
             reportCounter = 0
+        element_control()
 	sleep(sleepInterval)
 	runTime += sleepInterval
 #soak
@@ -76,8 +137,10 @@ while soaking == 1:
         currentTemp = sensor.readTempC()
         if currentTemp < setTemp-lowTolerance:
                 element.on()
+                elementState=1
         if currentTemp > setTemp+highTolerance:
                 element.off()
+                elementState=0
         
         if runTime - startSoak >= soakTime:
         	soaking = 0
@@ -85,7 +148,8 @@ while soaking == 1:
 		element.off()
 	else:
                 if reportCounter >= reportInterval:
-        	        print('Soaking... Current temp:' + str(currentTemp) + 'C Set Temp:' + str(setTemp) + 'C SoakTime:' + str(runTime-startSoak) + 's of ' + str(soakTime) + 's')
+        	        print('Soaking'+ str(elementState) + '... Current temp:' + str(currentTemp) + 'C Set Temp:' + str(setTemp) + 'C SoakTime:' + str(runTime-startSoak) + 's of ' + str(soakTime) + 's')
                         reportCounter = 0
+                #element_control()
         	sleep(sleepInterval)
 		runTime += sleepInterval
