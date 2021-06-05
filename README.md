@@ -1,7 +1,11 @@
 # pikiln
 Raspberry Pi Kiln Controller by William Olson
 
-Tested on RaspberryPI Zero W
+Tested on: 
+
+RaspberryPI Zero W: https://www.adafruit.com/product/3400
+
+Thermocouple Amplifier MAX31855 breakout board: https://www.adafruit.com/product/269
 
 Prereqs:
 
