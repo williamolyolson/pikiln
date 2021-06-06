@@ -46,12 +46,12 @@ elementState =0
 onDutyCnt=0
 offDutyCnt=5
 onDutyTime=5
-offDutyTime=20
+offDutyTime=60
 tempRiseRateLimit=0
 tempRiseRate=0
 maxElementOnTime=60
 minElementOnTime=5
-maxElementOffTime=30
+maxElementOffTime=60
 minElementOffTime=5
 startingTemp=0
 checkFreq=20
@@ -66,18 +66,18 @@ def check_rates():
     if tempRiseRate < tempRiseRateLimit:
         #increase onDutyTime/decrease offDutyTime
         if onDutyTime < maxElementOnTime:
-            onDutyTime+=1
+            onDutyTime+=round(abs(tempRiseRate-tempRiseRateLimit),1)
         else:
             if offDutyTime > minElementOffTime:
-                offDutyTime -= 1
+                offDutyTime -= round(abs(tempRiseRate-tempRiseRateLimit),1)
             
     if tempRiseRate > tempRiseRateLimit:
         #decrease onDutyTime/increase offDutytime
         if onDutyTime > minElementOnTime:
-            onDutyTime -=1
+            onDutyTime -=round(abs(tempRiseRate-tempRiseRateLimit),1)
         else:
             if offDutyTime < maxElementOffTime:
-                offDutyTime += 1
+                offDutyTime += round(abs(tempRiseRate-tempRiseRateLimit),1)
 
     print('Current Rise Rate/Limit:' + str(tempRiseRate) + '/' + str(tempRiseRateLimit))
     print('Element Duty Cycle(on/off)(s):' + str(onDutyTime) + '/' + str(offDutyTime))
@@ -90,11 +90,11 @@ def element_control():
     checkCnt += 1
     onDutyCnt += 1
     offDutyCnt +=1
-    if checkCnt >= checkFreq:
-        if elementState == 1:
-            check_rates()
+    #if checkCnt >= checkFreq:
+    #    if elementState == 1:
+    #        check_rates()
 
-        checkCnt = 0
+    #    checkCnt = 0
 
     if elementState == 1:
         #on mode5
@@ -112,6 +112,7 @@ def element_control():
             else:
                 onDutyCnt = 0
                 elementToggle=1
+                check_rates()
     else:
         #off mode
         element.off()
@@ -132,7 +133,7 @@ print('Element Duty Cycle(on/off)(s):' + str(onDutyTime) + '/' + str(offDutyTime
 
 #rising
 while rising == 1:
-        print('On:'+str(onDutyCnt)+'--Off:'+str(offDutyCnt))
+        #print('On:'+str(onDutyCnt)+'--Off:'+str(offDutyCnt))
 	reportCounter += 1
 	currentTemp = sensor.readTempC()
         #if currentTemp < stepTemp:
