@@ -44,52 +44,74 @@ soaking = 1
 element = OutputDevice(23)
 elementState =0
 onDutyCnt=0
-offDutyCnt=0
-onDutyTime=10
-offDutyTime=10
+offDutyCnt=5
+onDutyTime=5
+offDutyTime=20
 tempRiseRateLimit=0
 tempRiseRate=0
 maxElementOnTime=60
+minElementOnTime=5
+maxElementOffTime=30
+minElementOffTime=5
 startingTemp=0
-checkFreq=10
+checkFreq=20
 checkCnt=0
+elementToggle=1
 
 def check_rates():
+    global tempRiseRate
+    global onDutyTime
+    global offDutyTime
     tempRiseRate = ((currentTemp - startingTemp)/runTime)*60
-    if tempRiseRate > tempRiseRateLimit:
+    if tempRiseRate < tempRiseRateLimit:
         #increase onDutyTime/decrease offDutyTime
-        if onDutyTime < maxElementOnTime
-            onDutyTime += 1
+        if onDutyTime < maxElementOnTime:
+            onDutyTime+=1
         else:
-            offDutyTime -= 1
-            if offDutyTime < 0:
-                offDutyTime = 0
-    else:
+            if offDutyTime > minElementOffTime:
+                offDutyTime -= 1
+            
+    if tempRiseRate > tempRiseRateLimit:
         #decrease onDutyTime/increase offDutytime
+        if onDutyTime > minElementOnTime:
+            onDutyTime -=1
+        else:
+            if offDutyTime < maxElementOffTime:
+                offDutyTime += 1
 
     print('Current Rise Rate/Limit:' + str(tempRiseRate) + '/' + str(tempRiseRateLimit))
     print('Element Duty Cycle(on/off)(s):' + str(onDutyTime) + '/' + str(offDutyTime))
 
 def element_control():
+    global checkCnt
+    global onDutyCnt
+    global offDutyCnt
+    global elementToggle
     checkCnt += 1
+    onDutyCnt += 1
+    offDutyCnt +=1
     if checkCnt >= checkFreq:
-        check_rates()
+        if elementState == 1:
+            check_rates()
+
         checkCnt = 0
+
     if elementState == 1:
-        #on mode
-        if onDutyCnt < onDutyTime:
-            onDutyCnt += 1
-            offDutyCnt = offDutyTime
-        else:
-            element.off()
-            offDutyCnt = 0
-            
-        if offDutyCnt < offDutyTime:
-            offDutyCnt += 1
-            onDutyCnt = onDutyTime
-        else:
-            element.on()
-            onDutyCnt = 0
+        #on mode5
+        if elementToggle == 1:
+            if onDutyCnt < onDutyTime:
+                #onDutyCnt += 1
+                element.on()
+            else:
+                offDutyCnt = 0
+                elementToggle=0
+        else:            
+            if offDutyCnt < offDutyTime:
+                #offDutyCnt += 1
+                element.off()
+            else:
+                onDutyCnt = 0
+                elementToggle=1
     else:
         #off mode
         element.off()
@@ -104,21 +126,22 @@ stepTemp = currentTemp + riseInterval
 
 print('Starting Temp:' + str(startingTemp))
 print('Target Temp:' + str(setTemp))
-print('Temp Rise Limit(deg/min):' + str(tempRiseRatelimit))
+print('Temp Rise Limit(deg/min):' + str(tempRiseRateLimit))
 print('Temp Rise Interval(deg/s):' + str(riseInterval))
 print('Element Duty Cycle(on/off)(s):' + str(onDutyTime) + '/' + str(offDutyTime))
 
 #rising
 while rising == 1:
+        print('On:'+str(onDutyCnt)+'--Off:'+str(offDutyCnt))
 	reportCounter += 1
 	currentTemp = sensor.readTempC()
-        if currentTemp < stepTemp:
-		#element.on()
-                elementState=1
-	if currentTemp > stepTemp+highTolerance:
-		#element.off()
-                elementState =0
-
+        #if currentTemp < stepTemp:
+	#	#element.on()
+        #        elementState=1
+	#if currentTemp > stepTemp+highTolerance:
+	#	#element.off()
+        #        elementState =0
+        elementState=1
 	stepTemp += riseInterval
 	if stepTemp > setTemp:
 		stepTemp = setTemp
