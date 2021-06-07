@@ -13,7 +13,7 @@ sensor = MAX31855.MAX31855(CLK, CS, DO)
 element = OutputDevice(23)
 
 #misc globals
-totalTime = soakTime + riseTime
+
 runTime = 1
 currentTemp = 0
 stepTemp = 0
@@ -42,6 +42,20 @@ elementToggle=1
 currentTemp = sensor.readTempC()
 startingTemp = currentTemp
 
+
+argcnt = len(sys.argv)
+if argcnt == 7:
+    setTemp = float(sys.argv[1])
+    riseTime = float(sys.argv[2])
+    soakTime = float(sys.argv[3])
+    lowTolerance = float(sys.argv[4])
+    highTolerance = float(sys.argv[5])
+    reportInterval = int(sys.argv[6])
+else:
+    #command line arguments appear invalid
+    sys.exit("Invalid Argument: kiln.py <settemp> <risetime> <soaktime> <lowtemptolerance> <hightemptolerance> <reportinterval>")
+    #end of program
+
 #define the incremental temp rise for ramp settings
 riseInterval = round((setTemp -currentTemp)/riseTime,4)
 
@@ -55,19 +69,9 @@ tempRiseRateLimit = riseInterval * 60
 #set next temp target for ramp up
 stepTemp = currentTemp + riseInterval
 
-argcnt = len(sys.argv)
+totalTime = soakTime + riseTime
 
-if argcnt == 7:
-    setTemp = float(sys.argv[1])
-    riseTime = float(sys.argv[2])
-    soakTime = float(sys.argv[3])
-    lowTolerance = float(sys.argv[4])
-    highTolerance = float(sys.argv[5])
-    reportInterval = int(sys.argv[6])
-else:
-    #command line arguments appear invalid
-    sys.exit("Invalid Argument: kiln.py <settemp> <risetime> <soaktime> <lowtemptolerance> <hightemptolerance> <reportinterval>")
-    #end of program
+
 
 #cmd line arguments appear valid, all variable set, report parameters and begin
 print('Fire Parameters: SetTemp:' + str(setTemp) + 'c RiseTime:' + str(riseTime) + 's SoakTime:' + str(soakTime) + 's')
@@ -92,7 +96,7 @@ def check_rates():
     tempRiseRate = ((currentTemp - startingTemp)/runTime)*60
     
     #Set the duty cycle modifier value to be the rounded absolute value of Rise Rate - the Rise Rate Limit
-    cycleMod = round(abs(tempRiseRate-tempRiseRateLimit),1)
+    cycleMod = abs(tempRiseRate-tempRiseRateLimit)
     
     #Rise Rate is too SLOW
     if tempRiseRate < tempRiseRateLimit:
