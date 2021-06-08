@@ -44,13 +44,14 @@ startingTemp = currentTemp
 
 
 argcnt = len(sys.argv)
-if argcnt == 7:
+if argcnt == 8:
     setTemp = float(sys.argv[1])
     riseTime = float(sys.argv[2])
     soakTime = float(sys.argv[3])
     lowTolerance = float(sys.argv[4])
     highTolerance = float(sys.argv[5])
     reportInterval = int(sys.argv[6])
+    startMode = int(sys.argv[7])
 else:
     #command line arguments appear invalid
     sys.exit("Invalid Argument: kiln.py <settemp> <risetime> <soaktime> <lowtemptolerance> <hightemptolerance> <reportinterval>")
@@ -71,6 +72,10 @@ stepTemp = currentTemp + riseInterval
 
 totalTime = soakTime + riseTime
 
+if startMode == 1:
+    #start hot
+    onDutyTime = 50
+    offDutyTime = 10
 
 
 #cmd line arguments appear valid, all variable set, report parameters and begin
