@@ -44,17 +44,18 @@ startingTemp = currentTemp
 
 
 argcnt = len(sys.argv)
-if argcnt == 8:
+if argcnt == 9:
     setTemp = float(sys.argv[1])
     riseTime = float(sys.argv[2])
     soakTime = float(sys.argv[3])
     lowTolerance = float(sys.argv[4])
     highTolerance = float(sys.argv[5])
     reportInterval = int(sys.argv[6])
-    startMode = int(sys.argv[7])
+    onDutyTime= int(sys.argv[7])
+    offDutyTime = int(sys.argv[8])
 else:
     #command line arguments appear invalid
-    sys.exit("Invalid Argument: kiln.py <settemp> <risetime> <soaktime> <lowtemptolerance> <hightemptolerance> <reportinterval>")
+    sys.exit("Invalid Argument: kiln.py <settemp> <risetime> <soaktime> <lowtemptolerance> <hightemptolerance> <reportinterval> <onDutyTime> <offDutyTime>")
     #end of program
 
 #define the incremental temp rise for ramp settings
@@ -71,12 +72,6 @@ tempRiseRateLimit = riseInterval * 60
 stepTemp = currentTemp + riseInterval
 
 totalTime = soakTime + riseTime
-
-if startMode == 1:
-    #start hot
-    onDutyTime = 50
-    offDutyTime = 10
-
 
 #cmd line arguments appear valid, all variable set, report parameters and begin
 print('Fire Parameters: SetTemp:' + str(setTemp) + 'c RiseTime:' + str(riseTime) + 's SoakTime:' + str(soakTime) + 's')
